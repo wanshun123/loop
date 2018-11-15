@@ -988,29 +988,26 @@ def save_numpy_features():
         durations = durations[first_phoneme:last_phoneme]
 
         if phonemes[0] == 'pau' and phonemes[-1] == 'pau':
+            assert phonemes[0] == 'pau'
+            assert phonemes[-1] == 'pau'
+            assert 'pau' not in phonemes[1:-1]
             phonemes = phonemes[1:-1]
+
+            durations = np.array(durations)
+            durations = durations * 200
+            durations = durations - durations[0]
+            durations = durations[1:] - durations[:-1]
+            durations = durations[:-1]
+            durations = np.round(durations, 0).astype('int32')
+            phonemes = np.array([phone2code[x] for x in phonemes], dtype='int32')
+            all_in_features.append(in_features)
+            all_out_features.append(out_features)
+            all_phonemes.append(phonemes)
+            all_durations.append(durations)
+            all_text.append(text_lu[fid])
+            all_ids.append(fid)
         else:
             print('WARNING: File %s %s does not have phoneme pau' % (label_files[fid], audio_files[fid]))
-
-        # comment out the assert lines below - otherwise crashes on some files
-        # assert phonemes[0] == 'pau'
-        # assert phonemes[-1] == 'pau'
-        # assert 'pau' not in phonemes[1:-1]
-        phonemes = phonemes[1:-1]
-
-        durations = np.array(durations)
-        durations = durations * 200
-        durations = durations - durations[0]
-        durations = durations[1:] - durations[:-1]
-        durations = durations[:-1]
-        durations = np.round(durations, 0).astype('int32')
-        phonemes = np.array([phone2code[x] for x in phonemes], dtype='int32')
-        all_in_features.append(in_features)
-        all_out_features.append(out_features)
-        all_phonemes.append(phonemes)
-        all_durations.append(durations)
-        all_text.append(text_lu[fid])
-        all_ids.append(fid)
 
     assert len(all_in_features) == len(all_out_features)
     assert len(all_in_features) == len(all_phonemes)
